@@ -1,0 +1,31 @@
+package mAPI;
+
+public class Constants {
+	public static final int
+		INDEX_BANK = 762,
+		BANK_ITEM_ARRAY = 95,
+		BANK_SCROLLBAR = 116,
+		BANK_DEPOSIT_ALL = 34,
+		BANK_DEPOSIT_EQUIPPED = 38,
+		BANK_DEPOSIT_SUMMONING = 40,
+		BANK_DEPOSIT_PURSE = 36,
+		BANK_CLOSE = 45,
+		BANK_SWITCH_EQUIPMENT = 120,
+		BANK_TAB_SELECTED = 1419,
+		BANK_AMOUNT_INDEX = 752,
+		BANK_AMOUNT_VISIBLE = 0,
+		
+		INDEX_DEPOSIT_BOX = 0,
+		DEPOSIT_BOX_CLOSE = 15,
+		DEPOSIT_BOX_DEPOSIT_ALL = 19,
+		DEPOSIT_BOX_DEPOSIT_EQUIPPED = 23,
+		DEPOSIT_BOX_DEPOSIT_SUMMONING = 25,
+		DEPOSIT_BOX_DEPOSIT_PURSE = 21;
+	
+	public static final int[] BANK_TABS = {65, 63, 61, 59, 57, 55, 53, 51, 49};
+	
+	public Constants() {
+		throw new AssertionError();
+	}
+
+}
