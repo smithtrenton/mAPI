@@ -1,52 +1,59 @@
 package mAPI;
 
 import java.awt.Point;
+import java.awt.Rectangle;
 
 import org.powerbot.game.api.methods.Widgets;
 import org.powerbot.game.api.methods.input.Keyboard;
 import org.powerbot.game.api.util.Random;
 import org.powerbot.game.api.util.Time;
 import org.powerbot.game.api.util.Timer;
-import org.powerbot.game.api.wrappers.widget.WidgetChild;
 import mAPI.Constants;
 
-public class BankItem extends WidgetChild {
+public class BankItem extends Item {
 	
 	public BankItem(int index) {
-		super(Widgets.get(Constants.INDEX_BANK), Widgets.get(Constants.INDEX_BANK, Constants.BANK_ITEM_ARRAY), index);
+		super(Constants.INDEX_BANK, Constants.BANK_ITEM_ARRAY, index);
 	}
 	
-	public int getID() {
-		return this.getChildId();
+	public Rectangle getBankBox() {
+		return Widgets.get(Constants.INDEX_BANK, Constants.BANK_ITEM_ARRAY).getBoundingRectangle();
 	}
 	
-	public int getCount() {
-		return this.getChildStackSize();
-	}
-	
-	public String getName() {
-		return this.getChildName();
-	}
-	
-	public int getX() {
+	public int getGlobalX() {
 		return this.getParent().getAbsoluteX() + this.getRelativeX();
 	}
 	
-	public int getY() {
+	public int getGlobalY() {
 		return this.getParent().getAbsoluteY() + this.getRelativeY();
 	}
 	
 	@Override
-	public Point getAbsoluteLocation() {
-		return new Point(this.getX(), this.getY());
+	public int getAbsoluteX() {
+		if (this.getBankBox().contains(new Point(this.getGlobalX(), this.getGlobalY())))
+			return (int) this.getGlobalX();
+		return -1;
 	}
 	
-	public boolean slotFilled() {
-		return getID() != -1;
+	@Override
+	public int getAbsoluteY() {
+		if (this.getBankBox().contains(new Point(this.getGlobalX(), this.getGlobalY())))
+			return (int) this.getGlobalY();
+		return -1;
+	}
+	
+	@Override
+	public Point getAbsoluteLocation() {
+		return new Point(this.getAbsoluteX(), this.getAbsoluteY());
+	}
+	
+	@Override
+	public boolean isOnScreen() {
+		return this.getBankBox().contains(this.getAbsoluteLocation());
 	}
 	
 	public boolean scrollTo() {
-		if (isOnScreen())
+		if (this.isOnScreen())
 			return true;
 		return Widgets.scroll(Widgets.get(Constants.INDEX_BANK, Constants.BANK_SCROLLBAR), this);
 	}
