@@ -11,8 +11,6 @@ import org.powerbot.game.api.util.Timer;
 import org.powerbot.game.api.wrappers.interactive.Npc;
 import org.powerbot.game.api.wrappers.widget.WidgetChild;
 
-import com.sun.xml.internal.bind.v2.schemagen.xmlschema.List;
-
 import mAPI.Constants;
 import mAPI.Misc;
 
@@ -139,12 +137,19 @@ public class Bank {
 	}
 	
 	public BankInvItem[] getBankInvItems() {
-		if (!bankScreen()) return null;
+		int parent, array;
+		if (bankScreen()) {
+			parent = Constants.INDEX_BANK;
+			array = Constants.BANK_ITEM_ARRAY;
+		} else if (depositBoxScreen()) {
+			parent = Constants.INDEX_DEPOSIT_BOX;
+			array = Constants.DEPOSIT_BOX_ITEM_ARRAY;
+		} else return null;
 		
 		ArrayList<BankInvItem> list = new ArrayList<BankInvItem>();
 		
 		for(int i = 0; i < 28; i++) {
-			BankInvItem item = new BankInvItem(i);
+			BankInvItem item = new BankInvItem(parent, array, i);
 			if (item.exists())
 				list.add(item);
 		}

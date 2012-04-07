@@ -8,8 +8,8 @@ import org.powerbot.game.api.util.Timer;
 
 public class BankInvItem extends Item {
 	
-	public BankInvItem(int index) {
-		super(Constants.INDEX_BANKINV, Constants.BANKINV_ITEM_ARRAY, index);
+	public BankInvItem(int parent, int array, int index) {
+		super(parent, array, index);
 	}
 	
 	public boolean deposit(int amount) {
