@@ -11,7 +11,7 @@ public class Misc {
 	
 	public static boolean inStrArr(final String str, final String[] arr) {
 		for(String s: arr) 
-			if (str.contains(s)) return true;
+			if (str.toLowerCase().contains(s.toLowerCase())) return true;
 		return false;
 	}
 	

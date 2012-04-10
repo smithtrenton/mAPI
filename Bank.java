@@ -198,19 +198,21 @@ public class Bank {
 		if (!InventoryEx.itemsInInv(ids))
 			return depositAll();
 		
-		for(Item item: InventoryEx.getInvItems())
+		for(Item item: Inventory.getItems())
 			if (!Misc.inIntArr(item.getId(), ids))
 				InventoryEx.deposit(item, 0);
-		return true;
+		return InventoryEx.getInvItems(ids).length == Inventory.getCount();
 	}
 	
 	public static boolean depositAllBut(String[] names) {				
 		if (!InventoryEx.itemsInInv(names)) return depositAll();
 		
 		for(Item item: Inventory.getItems())
-			if (!Misc.inStrArr(item.getName(), names))
-				InventoryEx.deposit(item, 0);
-		return true;
+			if (!Misc.inStrArr(item.getName(), names)) {
+				InventoryEx.deposit(item, 0);				
+			}
+		
+		return InventoryEx.getInvItems(names).length == Inventory.getCount();
 	}
 	
 	public static boolean depositAllBut(String name) {

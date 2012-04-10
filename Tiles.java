@@ -34,6 +34,13 @@ public class Tiles {
 				Random.nextInt(a.getY() - off, a.getY() + off), a.getPlane());
 	}
 	
+	public static Tile[] reversePath(Tile[] arr) {
+		for (int left=0, right=arr.length-1; left<right; left++, right--) {
+		    Tile temp = arr[left]; arr[left] = arr[right]; arr[right] = temp;
+		}
+		return arr;
+	}
+	
 	public static boolean tileOnMM(Tile a) {
 		return Calculations.isPointOnScreen(Calculations.worldToMap(a.getX(), a.getY()));
 	}

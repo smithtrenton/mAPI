@@ -14,13 +14,16 @@ import org.powerbot.game.api.wrappers.node.Item;
 public class InventoryEx {
 	
 	public static boolean bankAction(Item item, String prefix, int amount) {
-		if (!item.getWidgetChild().validate())
+		if(!Bank.bankScreen()) 
 			return false;
 		switch(amount) {
 		case -1:
 			return item.getWidgetChild().interact(prefix + "-All but one");
 		case 0:
-			return item.getWidgetChild().interact(prefix + "-All");
+			if (countItems(item.getId()) > 1)
+				return item.getWidgetChild().interact(prefix + "-All");
+			else 
+				return item.getWidgetChild().interact(prefix);
 		case 1:
 			return item.getWidgetChild().click(true);
 		default:
@@ -41,7 +44,17 @@ public class InventoryEx {
 	}
 	
 	public static boolean deposit(Item item, int amount) {
-		return bankAction(item, "Deposit", amount);
+		int c = Inventory.getCount();
+		Timer timeout = new Timer(2000);
+		while (timeout.getRemaining() > 0) {
+			if (c > Inventory.getCount() ||
+					countItems(item.getId()) == 0) break;
+			if (bankAction(item, "Deposit", amount))
+				Time.sleep(Random.nextInt(750, 1000));
+			else 
+				Time.sleep(Random.nextInt(250, 350));
+		}
+		return (c > Inventory.getCount());
 	}
 	
 	public static boolean isFull() {
@@ -57,7 +70,9 @@ public class InventoryEx {
 		for(Item b:Inventory.getItems())
 			if (filter.accept(b))
 				list.add(b);
-		return (Item[])list.toArray();
+		Item[] result = new Item[list.size()];
+		list.toArray(result);
+		return result;
 	}
 	
 	public static Item[] getInvItems(final String[] names) {
@@ -101,7 +116,7 @@ public class InventoryEx {
 		return getInvItem(new Filter<Item>() {
 			@Override
 			public boolean accept(Item b) {
-				return (b.getName() == name);
+				return (b.getName().toLowerCase().contains(name.toLowerCase()));
 			}});
 	}
 	
@@ -117,6 +132,10 @@ public class InventoryEx {
 		return getInvItems(names).length > 0;
 	}
 	
+	public static boolean itemsInInv(final String name) {
+		return getInvItems(new String[] {name}).length > 0;
+	}
+	
 	public static boolean itemInInv(final Filter<Item> filter) {
 		return getInvItem(filter) != null;
 	}
@@ -128,5 +147,46 @@ public class InventoryEx {
 	public static boolean itemInInv(final String name) {
 		return getInvItem(name) != null;
 	}
+	
+	public static int countItems(final String[] names) {
+		return Inventory.getCount(new Filter<Item>() {
+			@Override
+			public boolean accept(Item b) {
+				return Misc.inStrArr(b.getName(), names);
+			}});
+	}
+	
+	public static int countItems(final int...ids) {
+		return Inventory.getCount(new Filter<Item>() {
+			@Override
+			public boolean accept(Item b) {
+				return Misc.inIntArr(b.getId(), ids);
+			}});
+	}
+	
+	public static int countItemsExcept(final Filter<Item> filter) {
+		return Inventory.getCount() - getInvItems(filter).length;
+	}
+	
+	public static int countItemsExcept(final String[] names) {
+		return countItemsExcept(new Filter<Item>() {
+			@Override
+			public boolean accept(Item b) {
+				return Misc.inStrArr(b.getName(), names);
+			}});
+	}
+	
+	public static int countItemsExcept(final int...ids) {
+		return countItemsExcept(new Filter<Item>() {
+			@Override
+			public boolean accept(Item b) {
+				return Misc.inIntArr(b.getId(), ids);
+			}});
+	}
+	
+	public static int countItemsExcept(final String name) {
+		return countItemsExcept(new String[] {name});
+	}
+	
 	
 }
