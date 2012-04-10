@@ -2,11 +2,13 @@ package mAPI;
 
 import org.powerbot.game.api.methods.Widgets;
 import org.powerbot.game.api.methods.interactive.Npcs;
+import org.powerbot.game.api.methods.tab.Inventory;
 import org.powerbot.game.api.util.Filter;
 import org.powerbot.game.api.util.Random;
 import org.powerbot.game.api.util.Time;
 import org.powerbot.game.api.util.Timer;
 import org.powerbot.game.api.wrappers.interactive.Npc;
+import org.powerbot.game.api.wrappers.node.Item;
 import org.powerbot.game.api.wrappers.widget.WidgetChild;
 
 import mAPI.Constants;
@@ -82,7 +84,7 @@ public class Bank {
 		return getBankItem(new Filter<BankItem>() {
 			@Override
 			public boolean accept(BankItem b) {
-				return (b.getId() == id);
+				return (b.getID() == id);
 			}			
 		});
 	}
@@ -104,7 +106,7 @@ public class Bank {
 		return itemInBank(new Filter<BankItem>() {
 			@Override
 			public boolean accept(BankItem b) {
-				return (b.getId() == id);
+				return (b.getID() == id);
 			}			
 		});
 	}
@@ -129,21 +131,21 @@ public class Bank {
 		return withdrawItem(new Filter<BankItem>() {
 			@Override
 			public boolean accept(BankItem b) {
-				return (b.getId() == id);
+				return (b.getID() == id);
 			}			
 		}, amount);
 	}	
 	
-	public static boolean depositItem(final Filter<ItemEx> filter, int amount) {
-		return InventoryEx.getInvItem(filter).deposit(amount);
+	public static boolean depositItem(final Filter<Item> filter, int amount) {
+		return InventoryEx.deposit(InventoryEx.getInvItem(filter), amount);
 	}
 	
 	public static boolean depositItem(final int id, int amount) {
-		return InventoryEx.getInvItem(id).deposit(amount);
+		return InventoryEx.deposit(InventoryEx.getInvItem(id), amount);
 	}
 	
 	public static boolean depositItem(final String name, int amount) {
-		return InventoryEx.getInvItem(name).deposit(amount);
+		return InventoryEx.deposit(InventoryEx.getInvItem(name), amount);
 	}
 	
 	public static boolean quickDeposit(final int button) {
@@ -169,28 +171,22 @@ public class Bank {
 	}
 	
 	public static boolean depositAll(int...ids) {
-		boolean quick = true;		
-		for(ItemEx item: InventoryEx.getInvItems())
-			if (!Misc.inIntArr(item.getId(), ids))
-				quick = false;					
-		if (quick) return depositAll();
+		if (InventoryEx.getInvItems(ids).length == Inventory.getCount())
+			return depositAll();
 		
-		for(ItemEx item: InventoryEx.getInvItems())
+		for(Item item: Inventory.getItems())
 			if (Misc.inIntArr(item.getId(), ids))
-				item.deposit(0);
+				InventoryEx.deposit(item, 0);
 		return true;
 	}
 	
-	public static boolean depositAll(String[] names) {
-		boolean quick = true;		
-		for(ItemEx item: InventoryEx.getInvItems())
-			if (!Misc.inStrArr(item.getName(), names))
-				quick = false;					
-		if (quick) return depositAll();
+	public static boolean depositAll(String[] names) {				
+		if (InventoryEx.getInvItems(names).length == Inventory.getCount())
+			return depositAll();
 		
-		for(ItemEx item: InventoryEx.getInvItems())
+		for(Item item: Inventory.getItems())
 			if (Misc.inStrArr(item.getName(), names))
-				item.deposit(0);
+				InventoryEx.deposit(item, 0);
 		return true;
 	}
 	
@@ -198,29 +194,22 @@ public class Bank {
 		return depositAll(new String[] {name});
 	}
 	
-	public static boolean depositAllBut(int...ids) {
-		boolean quick = true;		
-		for(ItemEx item: InventoryEx.getInvItems())
-			if (Misc.inIntArr(item.getId(), ids))
-				quick = false;					
-		if (quick) return depositAll();
+	public static boolean depositAllBut(int...ids) {				
+		if (!InventoryEx.itemsInInv(ids))
+			return depositAll();
 		
-		for(ItemEx item: InventoryEx.getInvItems())
+		for(Item item: InventoryEx.getInvItems())
 			if (!Misc.inIntArr(item.getId(), ids))
-				item.deposit(0);
+				InventoryEx.deposit(item, 0);
 		return true;
 	}
 	
-	public static boolean depositAllBut(String[] names) {
-		boolean quick = true;		
-		for(ItemEx item: InventoryEx.getInvItems())
-			if (Misc.inStrArr(item.getName(), names))
-				quick = false;					
-		if (quick) return depositAll();
+	public static boolean depositAllBut(String[] names) {				
+		if (!InventoryEx.itemsInInv(names)) return depositAll();
 		
-		for(ItemEx item: InventoryEx.getInvItems())
+		for(Item item: Inventory.getItems())
 			if (!Misc.inStrArr(item.getName(), names))
-				item.deposit(0);
+				InventoryEx.deposit(item, 0);
 		return true;
 	}
 	
