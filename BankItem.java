@@ -10,7 +10,7 @@ import org.powerbot.game.api.util.Time;
 import org.powerbot.game.api.util.Timer;
 import mAPI.Constants;
 
-public class BankItem extends Item {
+public class BankItem extends ItemEx {
 	
 	public BankItem(int index) {
 		super(Constants.INDEX_BANK, Constants.BANK_ITEM_ARRAY, index);
@@ -21,33 +21,29 @@ public class BankItem extends Item {
 	}
 	
 	public int getGlobalX() {
-		return this.getParent().getAbsoluteX() + this.getRelativeX();
+		return this.getWidgetChild().getParent().getAbsoluteX() + this.getWidgetChild().getRelativeX();
 	}
 	
 	public int getGlobalY() {
-		return this.getParent().getAbsoluteY() + this.getRelativeY();
+		return this.getWidgetChild().getParent().getAbsoluteY() + this.getWidgetChild().getRelativeY();
 	}
 	
-	@Override
 	public int getAbsoluteX() {
 		if (this.getBankBox().contains(new Point(this.getGlobalX(), this.getGlobalY())))
 			return (int) this.getGlobalX();
 		return -1;
 	}
 	
-	@Override
 	public int getAbsoluteY() {
 		if (this.getBankBox().contains(new Point(this.getGlobalX(), this.getGlobalY())))
 			return (int) this.getGlobalY();
 		return -1;
 	}
 	
-	@Override
 	public Point getAbsoluteLocation() {
 		return new Point(this.getAbsoluteX(), this.getAbsoluteY());
 	}
 	
-	@Override
 	public boolean isOnScreen() {
 		return this.getBankBox().contains(this.getAbsoluteLocation());
 	}
@@ -55,28 +51,28 @@ public class BankItem extends Item {
 	public boolean scrollTo() {
 		if (this.isOnScreen())
 			return true;
-		return Widgets.scroll(Widgets.get(Constants.INDEX_BANK, Constants.BANK_SCROLLBAR), this);
+		return Widgets.scroll(Widgets.get(Constants.INDEX_BANK, Constants.BANK_SCROLLBAR), this.getWidgetChild());
 	}
 	
 	public boolean withdraw(int amount) {
 		if (this.scrollTo()) 
 			switch(amount) {
 			case -1:
-				return this.interact("Withdraw-All but one");
+				return this.getWidgetChild().interact("Withdraw-All but one");
 			case 0:
-				return this.interact("Withdraw-All");
+				return this.getWidgetChild().interact("Withdraw-All");
 			case 1:
-				return this.click(true);
+				return this.getWidgetChild().click(true);
 			default:
-				String[] actions = this.getActions();
+				String[] actions = this.getWidgetChild().getActions();
 				for(String str:actions)
 					if (str.equals("Withdraw-" + amount))
-						return this.interact("Withdraw-" + amount);
+						return this.getWidgetChild().interact("Withdraw-" + amount);
 				Timer timeout = new Timer(3500);
 				//TO-DO: Solid method for detection of box!!!
 				while (!Widgets.get(Constants.BANK_AMOUNT_INDEX, Constants.BANK_AMOUNT_VISIBLE).isVisible()) {
 					if (timeout.getRemaining() == 0) return false;
-					this.interact("Withdraw-X");
+					this.getWidgetChild().interact("Withdraw-X");
 					Time.sleep(Random.nextInt(1200, 1600));
 				}					
 				Keyboard.sendText("" + amount, true);

@@ -1,7 +1,5 @@
 package mAPI;
 
-import java.util.ArrayList;
-
 import org.powerbot.game.api.methods.Widgets;
 import org.powerbot.game.api.methods.interactive.Npcs;
 import org.powerbot.game.api.util.Filter;
@@ -16,21 +14,21 @@ import mAPI.Misc;
 
 public class Bank {
 	
-	public boolean bankScreen() {
+	public static boolean bankScreen() {
 		return Widgets.get(Constants.INDEX_BANK).validate();
 	}
 	
-	public boolean depositBoxScreen() {
+	public static boolean depositBoxScreen() {
 		return Widgets.get(Constants.INDEX_DEPOSIT_BOX).validate();
 	}
 	
-	public void closeBank() {
+	public static void closeBank() {
 		WidgetChild btn = Widgets.get(Constants.INDEX_BANK, Constants.BANK_CLOSE);
 		if (btn.validate())
 			btn.click(true);
 	}
 	
-	public boolean closeBankWait() {
+	public static boolean closeBankWait() {
 		Timer timeout = new Timer(3000);
 		while (bankScreen()) {
 			if (timeout.getRemaining() <= 0)
@@ -41,11 +39,11 @@ public class Bank {
 		return !bankScreen();
 	}
 	
-	public WidgetChild[] getBankArray() {
+	public static WidgetChild[] getBankArray() {
 		return Widgets.get(Constants.INDEX_BANK, Constants.BANK_ITEM_ARRAY).getChildren();
 	}
 	
-	public BankItem[] getBankItems() {
+	public static BankItem[] getBankItems() {
 		if (!bankScreen()) return null;
 		WidgetChild[] bank_items = getBankArray();
 		int last_index = 0;
@@ -60,18 +58,18 @@ public class Bank {
 		return barr;
 	}
 	
-	public int getBankCount() {
+	public static int getBankCount() {
 		return getBankItems().length;
 	}
 	
-	public BankItem getBankItem(final Filter<BankItem> filter) {
+	public static BankItem getBankItem(final Filter<BankItem> filter) {
 		for(BankItem b:getBankItems())
 			if (filter.accept(b))
 				return b;
 		return null;
 	}
 	
-	public BankItem getBankItem(final String name) {
+	public static BankItem getBankItem(final String name) {
 		return getBankItem(new Filter<BankItem>() {
 			@Override
 			public boolean accept(BankItem b) {
@@ -80,20 +78,20 @@ public class Bank {
 		});
 	}
 	
-	public BankItem getBankItem(final int id) {
+	public static BankItem getBankItem(final int id) {
 		return getBankItem(new Filter<BankItem>() {
 			@Override
 			public boolean accept(BankItem b) {
-				return (b.getID() == id);
+				return (b.getId() == id);
 			}			
 		});
 	}
 	
-	public boolean itemInBank(final Filter<BankItem> filter) {
+	public static boolean itemInBank(final Filter<BankItem> filter) {
 		return (getBankItem(filter) != null);
 	}
 	
-	public boolean itemInBank(final String name) {
+	public static boolean itemInBank(final String name) {
 		return itemInBank(new Filter<BankItem>() {
 			@Override
 			public boolean accept(BankItem b) {
@@ -102,23 +100,23 @@ public class Bank {
 		});
 	}
 	
-	public boolean itemInBank(final int id) {
+	public static boolean itemInBank(final int id) {
 		return itemInBank(new Filter<BankItem>() {
 			@Override
 			public boolean accept(BankItem b) {
-				return (b.getID() == id);
+				return (b.getId() == id);
 			}			
 		});
 	}
 	
-	public boolean withdrawItem(final Filter<BankItem> filter, int amount) {
+	public static boolean withdrawItem(final Filter<BankItem> filter, int amount) {
 		if(!bankScreen() || !itemInBank(filter) || amount < -1)
 			return false;
 		
 		return getBankItem(filter).withdraw(amount);
 	}
 	
-	public boolean withdrawItem(final String name, final int amount) {
+	public static boolean withdrawItem(final String name, final int amount) {
 		return withdrawItem(new Filter<BankItem>() {
 			@Override
 			public boolean accept(BankItem b) {
@@ -127,166 +125,110 @@ public class Bank {
 		}, amount);
 	}
 	
-	public boolean withdrawItem(final int id, final int amount) {
+	public static boolean withdrawItem(final int id, final int amount) {
 		return withdrawItem(new Filter<BankItem>() {
 			@Override
 			public boolean accept(BankItem b) {
-				return (b.getID() == id);
+				return (b.getId() == id);
 			}			
 		}, amount);
+	}	
+	
+	public static boolean depositItem(final Filter<ItemEx> filter, int amount) {
+		return InventoryEx.getInvItem(filter).deposit(amount);
 	}
 	
-	public BankInvItem[] getBankInvItems() {
-		int parent, array;
-		if (bankScreen()) {
-			parent = Constants.INDEX_BANK;
-			array = Constants.BANK_ITEM_ARRAY;
-		} else if (depositBoxScreen()) {
-			parent = Constants.INDEX_DEPOSIT_BOX;
-			array = Constants.DEPOSIT_BOX_ITEM_ARRAY;
-		} else return null;
-		
-		ArrayList<BankInvItem> list = new ArrayList<BankInvItem>();
-		
-		for(int i = 0; i < 28; i++) {
-			BankInvItem item = new BankInvItem(parent, array, i);
-			if (item.exists())
-				list.add(item);
-		}
-		
-		return (BankInvItem[])list.toArray();
+	public static boolean depositItem(final int id, int amount) {
+		return InventoryEx.getInvItem(id).deposit(amount);
 	}
 	
-	public int getBankInvCount() {
-		return getBankInvItems().length;
+	public static boolean depositItem(final String name, int amount) {
+		return InventoryEx.getInvItem(name).deposit(amount);
 	}
 	
-	public BankInvItem getBankInvItem(final Filter<BankInvItem> filter) {
-		for(BankInvItem b:getBankInvItems())
-			if (filter.accept(b))
-				return b;
-		return null;
-	}
-	
-	public BankInvItem getBankInvItem(final int id) {
-		return getBankInvItem(new Filter<BankInvItem>() {
-			@Override
-			public boolean accept(BankInvItem b) {
-				return (b.getID() == id);
-			}});
-	}
-	
-	public BankInvItem getBankInvItem(final String name) {
-		return getBankInvItem(new Filter<BankInvItem>() {
-			@Override
-			public boolean accept(BankInvItem b) {
-				return (b.getName() == name);
-			}});
-	}
-	
-	public boolean itemInBankInv(final Filter<BankInvItem> filter) {
-		return getBankInvItem(filter).exists();
-	}
-	
-	public boolean itemInBankInv(final int id) {
-		return getBankInvItem(id).exists();
-	}
-	
-	public boolean itemInBankInv(final String name) {
-		return getBankInvItem(name).exists();
-	}
-	
-	public boolean depositItem(final Filter<BankInvItem> filter, int amount) {
-		return getBankInvItem(filter).deposit(amount);
-	}
-	
-	public boolean depositItem(final int id, int amount) {
-		return getBankInvItem(id).deposit(amount);
-	}
-	
-	public boolean depositItem(final String name, int amount) {
-		return getBankInvItem(name).deposit(amount);
-	}
-	
-	public boolean quickDeposit(final int button) {
+	public static boolean quickDeposit(final int button) {
 		if(depositBoxScreen())
 			return Widgets.get(Constants.INDEX_DEPOSIT_BOX, Constants.DEPOSIT_BOX_DEPOSIT_OFFSET + button).click(true);
 		return Widgets.get(Constants.INDEX_BANK, Constants.BANK_DEPOSIT_OFFSET  + button).click(true);
 	}
 	
-	public boolean depositSummon() {
+	public static boolean depositSummon() {
 		return quickDeposit(Constants.BANK_DEPOSIT_SUMMONING);
 	}
 	
-	public boolean depositEquipped() {
+	public static boolean depositEquipped() {
 		return quickDeposit(Constants.BANK_DEPOSIT_EQUIPPED);
 	}
 	
-	public boolean depositCoins() {
+	public static boolean depositCoins() {
 		return quickDeposit(Constants.BANK_DEPOSIT_PURSE);
 	}
 	
-	public boolean depositAll() {
+	public static boolean depositAll() {
 		return quickDeposit(Constants.BANK_DEPOSIT_ALL);
 	}
 	
-	public boolean depositAll(int...ids) {
+	public static boolean depositAll(int...ids) {
 		boolean quick = true;		
-		for(BankInvItem item: getBankInvItems())
-			if (!Misc.inIntArr(item.getID(), ids))
+		for(ItemEx item: InventoryEx.getInvItems())
+			if (!Misc.inIntArr(item.getId(), ids))
 				quick = false;					
 		if (quick) return depositAll();
 		
-		for(BankInvItem item: getBankInvItems())
-			if (Misc.inIntArr(item.getID(), ids))
+		for(ItemEx item: InventoryEx.getInvItems())
+			if (Misc.inIntArr(item.getId(), ids))
 				item.deposit(0);
 		return true;
 	}
 	
-	public boolean depositAll(String[] names) {
+	public static boolean depositAll(String[] names) {
 		boolean quick = true;		
-		for(BankInvItem item: getBankInvItems())
+		for(ItemEx item: InventoryEx.getInvItems())
 			if (!Misc.inStrArr(item.getName(), names))
 				quick = false;					
 		if (quick) return depositAll();
 		
-		for(BankInvItem item: getBankInvItems())
+		for(ItemEx item: InventoryEx.getInvItems())
 			if (Misc.inStrArr(item.getName(), names))
 				item.deposit(0);
 		return true;
 	}
 	
-	public boolean depositAllBut(int...ids) {
+	public static boolean depositAll(String name) {
+		return depositAll(new String[] {name});
+	}
+	
+	public static boolean depositAllBut(int...ids) {
 		boolean quick = true;		
-		for(BankInvItem item: getBankInvItems())
-			if (Misc.inIntArr(item.getID(), ids))
+		for(ItemEx item: InventoryEx.getInvItems())
+			if (Misc.inIntArr(item.getId(), ids))
 				quick = false;					
 		if (quick) return depositAll();
 		
-		for(BankInvItem item: getBankInvItems())
-			if (!Misc.inIntArr(item.getID(), ids))
+		for(ItemEx item: InventoryEx.getInvItems())
+			if (!Misc.inIntArr(item.getId(), ids))
 				item.deposit(0);
 		return true;
 	}
 	
-	public boolean depositAllBut(String[] names) {
+	public static boolean depositAllBut(String[] names) {
 		boolean quick = true;		
-		for(BankInvItem item: getBankInvItems())
+		for(ItemEx item: InventoryEx.getInvItems())
 			if (Misc.inStrArr(item.getName(), names))
 				quick = false;					
 		if (quick) return depositAll();
 		
-		for(BankInvItem item: getBankInvItems())
+		for(ItemEx item: InventoryEx.getInvItems())
 			if (!Misc.inStrArr(item.getName(), names))
 				item.deposit(0);
 		return true;
 	}
 	
-	public boolean depositAllbut(String name) {
+	public static boolean depositAllBut(String name) {
 		return depositAllBut(new String[] {name});
 	}
 	
-	public int getCurrentBankTab() {
+	public static int getCurrentBankTab() {
 		if (!bankScreen()) return -1;
 		for(int i = 0; i<Constants.BANK_TABS.length; i++)
 			if (Widgets.get(Constants.INDEX_BANK, Constants.BANK_TABS[i] - 1).getTextureId() == Constants.BANK_TAB_SELECTED)
@@ -294,7 +236,7 @@ public class Bank {
 		return -1;
 	}
 	
-	public boolean openBankTab(int tab) {
+	public static boolean openBankTab(int tab) {
 		if (getCurrentBankTab() == tab)
 			return true;
 		

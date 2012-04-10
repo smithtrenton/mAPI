@@ -5,9 +5,11 @@ import org.powerbot.game.api.methods.tab.Skills;
 public class SkillTracker {
 	private int startxp, curxp, skill,
 		startlvl, curlvl;
+	private boolean setup;
 	
 	public SkillTracker(int skill) {
 		this.skill = skill;
+		this.setup = false;
 	}
 	
 	public int getStartExp() {
@@ -50,14 +52,20 @@ public class SkillTracker {
 		return getPercentToLvl(getCurrentLevel() + 1);
 	}
 	
-	public void setup() {
-		this.startlvl = Skills.getLevel(skill);
-		this.curlvl = this.startlvl;
-		this.startxp = Skills.getExperience(skill);
-		this.curxp = this.startxp;
+	public double getExpPerHour(long msec) {
+		return Misc.getRate(getGainedExp(), msec);
+	}
+	
+	public boolean isSetup() {
+		return setup;
 	}
 	
 	public void update() {
+		if (!setup) {
+			this.startxp = Skills.getExperience(skill);
+			this.startlvl = Skills.getLevel(skill);	
+			setup = true;
+		}
 		this.curxp = Skills.getExperience(skill);
 		this.curlvl = Skills.getLevel(skill);
 	}
