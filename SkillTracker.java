@@ -37,18 +37,18 @@ public class SkillTracker {
 	}
 
 	public int getExperienceToLevel(int lvl) {
-		return Skills.getExperienceToLevel(this.skill, lvl);
+		return Skills.getExperienceRequired(lvl) - getCurrentExp();
 	}
 	
-	public int getExperienceToLevel() {
-		return getExperienceToLevel(this.getCurrentLevel() + 1);
+	public int getExperienceToNextLevel() {
+		return getExperienceToLevel(getCurrentLevel() + 1);
 	}
 	
 	public double getPercentToLvl(int lvl) {
-		return 100.0D * (getCurrentExp() / (double)getExperienceToLevel(lvl));
+		return 100.0D * ((double)(getCurrentExp() - Skills.getExperienceRequired(lvl-1)) / (Skills.getExperienceRequired(lvl) - Skills.getExperienceRequired(lvl-1)));
 	}
 	
-	public double getPercentToLvl() {
+	public double getPercentToNextLvl() {
 		return getPercentToLvl(getCurrentLevel() + 1);
 	}
 	

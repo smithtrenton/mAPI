@@ -6,7 +6,8 @@ import org.powerbot.game.api.methods.interactive.Players;
 public class Misc {
 	
 	public static boolean isFullyLoggedIn() {
-		return Game.getClientState() == Game.INDEX_MAP_LOADED && Game.isLoggedIn() && Players.getLocal() != null ;
+		return Game.getClientState() == Game.INDEX_MAP_LOADED && Game.isLoggedIn()
+				&& Players.getLocal() != null && Players.getLocal().getLevel() > 0;
 	}
 	
 	public static boolean inStrArr(final String str, final String[] arr) {
@@ -26,4 +27,5 @@ public class Misc {
 			time++;
 		return ((value * 3600000D) / time);
 	}
+	
 }
